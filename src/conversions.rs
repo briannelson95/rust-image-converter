@@ -7,7 +7,6 @@ use image::codecs::jpeg::JpegEncoder;
 use image::codecs::png::PngEncoder;
 use image::ImageEncoder;
 use webp::Encoder;
-use webp::Decoder;
 use image::DynamicImage;
 
 pub fn convert_jpeg_to_webp(input_path: &str, output_path: &str) -> Result<(), Box<dyn std::error::Error>> {
