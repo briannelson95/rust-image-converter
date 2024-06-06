@@ -16,6 +16,7 @@ Desktop image converter built in Rust.
 - [x] Add all image conversion types
     - [ ] Convert image from HEIC to any other format
 - [ ] Add image preview for single image conversion
+- [ ] Add pdf to image types conversion
 
 ### Bulk Conversion
 *details to come*
