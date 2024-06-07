@@ -12,7 +12,8 @@ use crate::conversions::{
     convert_jpeg_to_png,
     convert_png_to_jpeg,
     convert_png_to_webp,
-    convert_webp_to_png
+    convert_webp_to_png,
+    convert_pdf_to_image,
 };
 use open;
 
@@ -24,6 +25,9 @@ enum ConversionType {
     JpegToPng,
     PngToJpeg,
     PngToWebp,
+    PdfToJpeg,
+    PdfToPng,
+    PdfToWebp,
 }
 
 struct MyApp {
@@ -57,6 +61,7 @@ impl MyApp {
                 "jpg" | "jpeg" => vec![ConversionType::JpegToWebp, ConversionType::JpegToPng],
                 "webp" => vec![ConversionType::WebpToJpeg, ConversionType::WebpToPng],
                 "png" => vec![ConversionType::PngToJpeg, ConversionType::PngToWebp],
+                "pdf" => vec![ConversionType::PdfToJpeg, ConversionType::PdfToPng, ConversionType:: PdfToWebp],
                 _ => vec![],
             };
             if !self.available_conversions.is_empty() {
@@ -77,7 +82,7 @@ impl eframe::App for MyApp {
                 ui.text_edit_singleline(&mut self.input_path);
                 if ui.button("Browse").clicked() {
                     if let Some(path) = FileDialog::new()
-                        .add_filter("Image files", &["jpg", "jpeg", "webp", "png"])
+                        .add_filter("Image files", &["jpg", "jpeg", "webp", "png", "pdf"])
                         .pick_file()
                     {
                         self.input_path = path.display().to_string();
@@ -93,6 +98,9 @@ impl eframe::App for MyApp {
                         Some(ConversionType::WebpToPng) => "WebP to PNG",
                         Some(ConversionType::PngToJpeg) => "PNG to JPEG",
                         Some(ConversionType::PngToWebp) => "PNG to WebP",
+                        Some(ConversionType::PdfToJpeg) => "PDF to JPEG",
+                        Some(ConversionType::PdfToPng) => "PDF to PNG",
+                        Some(ConversionType::PdfToWebp) => "PDF to WebP",
                         None => "Select Conversion",
                     })
                     .show_ui(ui, |ui| {
@@ -104,6 +112,9 @@ impl eframe::App for MyApp {
                                 ConversionType::WebpToPng => "Webp to PNG",
                                 ConversionType::PngToJpeg => "PNG to JPEG",
                                 ConversionType::PngToWebp => "PNG to WebP",
+                                ConversionType::PdfToJpeg => "PDF to JPEG",
+                                ConversionType::PdfToPng => "PDF to PNG",
+                                ConversionType::PdfToWebp => "PDF to WebP",
                             });
                         }
                     });
@@ -155,6 +166,9 @@ impl eframe::App for MyApp {
                         Some(ConversionType::PngToJpeg) => "jpeg",
                         Some(ConversionType::PngToWebp) => "webp",
                         Some(ConversionType::WebpToPng) => "png",
+                        Some(ConversionType::PdfToJpeg) => "jpeg",
+                        Some(ConversionType::PdfToPng) => "png",
+                        Some(ConversionType::PdfToWebp) => "webp",
                         _ => "",
                     };
     
@@ -172,6 +186,9 @@ impl eframe::App for MyApp {
                         Some(ConversionType::PngToJpeg) => convert_png_to_jpeg(&self.input_path, final_output_path.to_str().unwrap()),
                         Some(ConversionType::PngToWebp) => convert_png_to_webp(&self.input_path, final_output_path.to_str().unwrap()),
                         Some(ConversionType::WebpToPng) => convert_webp_to_png(&self.input_path, final_output_path.to_str().unwrap()),
+                        Some(ConversionType::PdfToJpeg) => convert_pdf_to_image(&self.input_path, final_output_path.to_str().unwrap(), "jpeg"),
+                        Some(ConversionType::PdfToPng) => convert_pdf_to_image(&self.input_path, final_output_path.to_str().unwrap(), "png"),
+                        Some(ConversionType::PdfToWebp) => convert_pdf_to_image(&self.input_path, final_output_path.to_str().unwrap(), "webp"),
                         _ => Err("Unsupported conversion type".into()),
                     };
     
