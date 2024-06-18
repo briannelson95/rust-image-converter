@@ -1,13 +1,17 @@
+use libheif_rs::{Channel, RgbChroma, ColorSpace, HeifContext, ItemId, LibHeif};
 use pdfium_render::prelude::*;
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
-use image::io::Reader as ImageReader;
-use image::codecs::jpeg::JpegEncoder;
-use image::codecs::png::PngEncoder;
-use image::ImageEncoder;
+use image::{
+    io::Reader as ImageReader,
+    codecs::{
+        jpeg::JpegEncoder,
+        png::PngEncoder,
+    },
+    {DynamicImage, ImageBuffer, ImageEncoder, RgbaImage}
+};
 use webp::Encoder;
-use image::DynamicImage;
 
 pub fn convert_jpeg_to_webp(input_path: &str, output_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
     let img = ImageReader::open(input_path)?.decode()?;
@@ -112,5 +116,87 @@ pub fn convert_pdf_to_image(input_path: &str, output_file_path: &str, format: &s
         _ => return Err("Unsupported format".into()),
     }
 
+    Ok(())
+}
+
+pub fn convert_heic_to_jpeg(input_path: &str, output_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let lib_heif = LibHeif::new();
+    let ctx = HeifContext::read_from_file("./data/test.heif")?;
+    let handle = ctx.primary_image_handle()?;
+    assert_eq!(handle.width(), 1652);
+    assert_eq!(handle.height(), 1791);
+
+    // Get Exif
+    let mut meta_ids: Vec<ItemId> = vec![0; 1];
+    let count = handle.metadata_block_ids(&mut meta_ids, b"Exif");
+    assert_eq!(count, 1);
+    let exif: Vec<u8> = handle.metadata(meta_ids[0])?;
+
+    // Decode the image
+    let image = lib_heif.decode(
+        &handle, 
+        ColorSpace::Rgb(RgbChroma::Rgb), 
+        None,
+    )?;
+    assert_eq!(
+        image.color_space(), 
+        Some(ColorSpace::Rgb(RgbChroma::Rgb)),
+    );
+    assert_eq!(image.width(), 1652);
+    assert_eq!(image.height(), 1791);
+
+    // Scale the image
+    let small_img = image.scale(1024, 800, None)?;
+    assert_eq!(small_img.width(), 1024);
+    assert_eq!(small_img.height(), 800);
+
+    // Get "pixels"
+    let planes = small_img.planes();
+    let interleaved_plane = planes.interleaved.unwrap();
+    assert_eq!(interleaved_plane.width, 1024);
+    assert_eq!(interleaved_plane.height, 800);
+    assert!(!interleaved_plane.data.is_empty());
+    assert!(interleaved_plane.stride > 0);
+
+    Ok(())
+}
+
+pub fn convert_heic_to_png(input_path: &str, output_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let ctx = HeifContext::read_from_file(input_path)?;
+    let handle = ctx.primary_image_handle()?;
+    let img = handle.decode(ColorSpace::Rgb(Chroma::Rgb), true)?;
+    
+    let width = img.width();
+    let height = img.height();
+    let data = img.to_vec()?;
+    
+    let image_buffer = ImageBuffer::<image::Rgb<u8>, _>::from_raw(width, height, data).unwrap();
+    let image = DynamicImage::ImageRgb8(image_buffer);
+
+    let output_file = File::create(output_file_path)?;
+    let mut writer = BufWriter::new(output_file);
+    let encoder = PngEncoder::new(&mut writer);
+    encoder.write_image(image.as_rgba8().unwrap().as_raw(), image.width(), image.height(), image::ColorType::Rgba8.into())?;
+    Ok(())
+}
+
+pub fn convert_heic_to_webp(input_path: &str, output_file_path: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let ctx = HeifContext::read_from_file(input_path)?;
+    let handle = ctx.primary_image_handle()?;
+    let img = handle.decode(ColorSpace::Rgb(Chroma::Rgb), true)?;
+    
+    let width = img.width();
+    let height = img.height();
+    let data = img.to_vec()?;
+    
+    let image_buffer = ImageBuffer::<image::Rgb<u8>, _>::from_raw(width, height, data).unwrap();
+    let image = DynamicImage::ImageRgb8(image_buffer);
+
+    let encoder = webp::Encoder::from_image(&image)?;
+    let webp_data = encoder.encode_lossless();
+
+    let output_file = File::create(output_file_path)?;
+    let mut writer = BufWriter::new(output_file);
+    writer.write_all(&webp_data)?;
     Ok(())
 }

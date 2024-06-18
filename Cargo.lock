@@ -1272,6 +1272,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "enumn"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fd000fd6988e73bbe993ea3db9b1aa64906ab88766d654973924340c8cddb42"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.66",
+]
+
+[[package]]
 name = "epaint"
 version = "0.27.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1441,6 +1452,12 @@ checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
 ]
+
+[[package]]
+name = "four-cc"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "431a4c31778fde52b4400de34975f219eeca55cc829a9de157cd743a5b230ecb"
 
 [[package]]
 name = "futures-channel"
@@ -2042,6 +2059,31 @@ dependencies = [
  "arbitrary",
  "cc",
  "once_cell",
+]
+
+[[package]]
+name = "libheif-rs"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40c32c0a0c970782707070f11c8612bced800b916af4ddaf6229161dc3ceb907"
+dependencies = [
+ "enumn",
+ "four-cc",
+ "libc",
+ "libheif-sys",
+]
+
+[[package]]
+name = "libheif-sys"
+version = "2.1.1+1.17.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f60b29be1ef3ab2aba61344f09a18c3edf552bf4f9fbec9bd68b9ea6f98e71f8"
+dependencies = [
+ "bindgen",
+ "libc",
+ "pkg-config",
+ "vcpkg",
+ "walkdir",
 ]
 
 [[package]]
@@ -3089,6 +3131,7 @@ version = "0.1.0"
 dependencies = [
  "eframe",
  "image 0.25.1",
+ "libheif-rs",
  "open",
  "pdfium-render",
  "rfd",
@@ -3680,6 +3723,12 @@ dependencies = [
  "num-traits",
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "vcpkg"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 
 [[package]]
 name = "vecmath"
