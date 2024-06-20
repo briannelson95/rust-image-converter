@@ -5,6 +5,7 @@ Desktop image converter built in Rust.
 ### Table of Contents
 - [Installation](#installation)
 - [To Do](#to-do)
+- [Errors](#errors)
 
 ## Installation
 This is a WIP and has not been fully released. To run this program right now, you will need to have rust installed on your machine; [learn how to install rust](https://www.rust-lang.org/tools/install). If you would like to use this program as-is, follow these instructions:
