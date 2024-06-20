@@ -41,3 +41,9 @@ This is a WIP and has not been fully released. To run this program right now, yo
 - [ ] Package for both macOS and Windows
 - [ ] Add to Releases on GitHub
 - [ ] Create webpage for easy download
+
+## Errors
+- Image preview not working
+- HEIC conversions not working
+- PDF conversion in the code but not really working
+    - Unable to write image file from pdf data
